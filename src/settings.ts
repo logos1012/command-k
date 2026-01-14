@@ -1,6 +1,6 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, Modal, TextComponent, ButtonComponent } from 'obsidian';
 import CmdKPlugin from './main';
-import { PRICING_PER_MILLION_TOKENS } from './types';
+import { PRICING_PER_MILLION_TOKENS, SavedPrompt } from './types';
 
 type OpenAIModel = keyof typeof PRICING_PER_MILLION_TOKENS.openai;
 type GeminiModel = keyof typeof PRICING_PER_MILLION_TOKENS.gemini;
@@ -53,6 +53,59 @@ function getClaudeModelLabel(model: ClaudeModel): string {
         'claude-3-haiku-20240307': 'Claude 3 Haiku',
     };
     return `${labels[model]} (${formatCost(pricing.input, pricing.output)})`;
+}
+
+// Simple modal for managing prompts in settings
+class PromptManagementModal extends Modal {
+    private prompts: SavedPrompt[];
+    private onSave: (prompts: SavedPrompt[]) => void;
+
+    constructor(app: App, prompts: SavedPrompt[], onSave: (prompts: SavedPrompt[]) => void) {
+        super(app);
+        this.prompts = [...prompts]; // Clone array
+        this.onSave = onSave;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl('h2', { text: 'Manage Saved Prompts' });
+
+        const promptList = contentEl.createDiv({ cls: 'prompt-management-list' });
+
+        this.prompts.forEach((prompt, index) => {
+            const promptItem = promptList.createDiv({ cls: 'prompt-management-item' });
+
+            new Setting(promptItem)
+                .setName(prompt.name)
+                .setDesc(`${prompt.prompt} (Used ${prompt.usageCount} times)`)
+                .addButton(btn => btn
+                    .setButtonText('Delete')
+                    .setWarning()
+                    .onClick(() => {
+                        this.prompts.splice(index, 1);
+                        this.onOpen(); // Refresh display
+                    }));
+        });
+
+        const buttonDiv = contentEl.createDiv({ cls: 'modal-button-container' });
+
+        new ButtonComponent(buttonDiv)
+            .setButtonText('Save Changes')
+            .setCta()
+            .onClick(() => {
+                this.onSave(this.prompts);
+                this.close();
+            });
+
+        new ButtonComponent(buttonDiv)
+            .setButtonText('Cancel')
+            .onClick(() => this.close());
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
 }
 
 export class CmdKSettingTab extends PluginSettingTab {
@@ -202,6 +255,42 @@ export class CmdKSettingTab extends PluginSettingTab {
                     const numValue = parseInt(value);
                     if (!isNaN(numValue) && numValue > 0) {
                         this.plugin.settings.maxTokens = Math.min(numValue, 7000);
+                        await this.plugin.saveSettings();
+                    }
+                }));
+
+        // Prompt Management
+        containerEl.createEl('h3', { text: 'Prompt Management' });
+
+        new Setting(containerEl)
+            .setName('Saved Prompts')
+            .setDesc('Manage your saved prompts for quick access')
+            .addButton(button => button
+                .setButtonText(`Manage Prompts (${this.plugin.settings.savedPrompts?.length || 0})`)
+                .onClick(() => {
+                    // Simple prompt management
+                    const modal = new PromptManagementModal(
+                        this.app,
+                        this.plugin.settings.savedPrompts || [],
+                        async (prompts) => {
+                            this.plugin.settings.savedPrompts = prompts;
+                            await this.plugin.saveSettings();
+                            this.display();
+                        }
+                    );
+                    modal.open();
+                }));
+
+        new Setting(containerEl)
+            .setName('Max Recent Prompts')
+            .setDesc('Maximum number of recent prompts to remember')
+            .addText(text => text
+                .setPlaceholder('5')
+                .setValue(String(this.plugin.settings.maxRecentPrompts || 5))
+                .onChange(async (value) => {
+                    const numValue = parseInt(value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                        this.plugin.settings.maxRecentPrompts = Math.min(numValue, 20);
                         await this.plugin.saveSettings();
                     }
                 }));

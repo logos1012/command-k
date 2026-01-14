@@ -70,7 +70,35 @@ var DEFAULT_SETTINGS = {
   geminiModel: "gemini-1.5-flash",
   claudeApiKey: "",
   claudeModel: "claude-3-haiku-20240307",
-  maxTokens: 7e3
+  maxTokens: 7e3,
+  savedPrompts: [
+    {
+      id: "1",
+      name: "Fix Grammar",
+      prompt: "Fix grammar and spelling errors",
+      category: "Writing",
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: "2",
+      name: "Make Concise",
+      prompt: "Make this text more concise while keeping the main points",
+      category: "Writing",
+      createdAt: Date.now(),
+      usageCount: 0
+    },
+    {
+      id: "3",
+      name: "Translate to Korean",
+      prompt: "Translate this text to Korean",
+      category: "Translation",
+      createdAt: Date.now(),
+      usageCount: 0
+    }
+  ],
+  recentPrompts: [],
+  maxRecentPrompts: 5
 };
 
 // src/settings.ts
@@ -120,6 +148,35 @@ function getClaudeModelLabel(model) {
   };
   return `${labels[model]} (${formatCost(pricing.input, pricing.output)})`;
 }
+var PromptManagementModal = class extends import_obsidian.Modal {
+  constructor(app, prompts, onSave) {
+    super(app);
+    this.prompts = [...prompts];
+    this.onSave = onSave;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.createEl("h2", { text: "Manage Saved Prompts" });
+    const promptList = contentEl.createDiv({ cls: "prompt-management-list" });
+    this.prompts.forEach((prompt, index) => {
+      const promptItem = promptList.createDiv({ cls: "prompt-management-item" });
+      new import_obsidian.Setting(promptItem).setName(prompt.name).setDesc(`${prompt.prompt} (Used ${prompt.usageCount} times)`).addButton((btn) => btn.setButtonText("Delete").setWarning().onClick(() => {
+        this.prompts.splice(index, 1);
+        this.onOpen();
+      }));
+    });
+    const buttonDiv = contentEl.createDiv({ cls: "modal-button-container" });
+    new import_obsidian.ButtonComponent(buttonDiv).setButtonText("Save Changes").setCta().onClick(() => {
+      this.onSave(this.prompts);
+      this.close();
+    });
+    new import_obsidian.ButtonComponent(buttonDiv).setButtonText("Cancel").onClick(() => this.close());
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+};
 var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -216,6 +273,29 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       }
     }));
+    containerEl.createEl("h3", { text: "Prompt Management" });
+    new import_obsidian.Setting(containerEl).setName("Saved Prompts").setDesc("Manage your saved prompts for quick access").addButton((button) => {
+      var _a;
+      return button.setButtonText(`Manage Prompts (${((_a = this.plugin.settings.savedPrompts) == null ? void 0 : _a.length) || 0})`).onClick(() => {
+        const modal = new PromptManagementModal(
+          this.app,
+          this.plugin.settings.savedPrompts || [],
+          async (prompts) => {
+            this.plugin.settings.savedPrompts = prompts;
+            await this.plugin.saveSettings();
+            this.display();
+          }
+        );
+        modal.open();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("Max Recent Prompts").setDesc("Maximum number of recent prompts to remember").addText((text) => text.setPlaceholder("5").setValue(String(this.plugin.settings.maxRecentPrompts || 5)).onChange(async (value) => {
+      const numValue = parseInt(value);
+      if (!isNaN(numValue) && numValue > 0) {
+        this.plugin.settings.maxRecentPrompts = Math.min(numValue, 20);
+        await this.plugin.saveSettings();
+      }
+    }));
     containerEl.createEl("h3", { text: "Keyboard Shortcuts" });
     const shortcutInfo = containerEl.createDiv();
     shortcutInfo.createEl("p", {
@@ -234,32 +314,67 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
 // src/ui/prompt-modal.ts
 var import_obsidian2 = require("obsidian");
 var PromptModal = class extends import_obsidian2.Modal {
-  constructor(app, selectedText, onSubmit) {
+  constructor(app, selectedText, savedPrompts, onSubmit, onSavePrompt, onDeletePrompt) {
     super(app);
     this.prompt = "";
     this.selectedText = selectedText;
+    this.savedPrompts = savedPrompts;
     this.onSubmit = onSubmit;
+    this.onSavePrompt = onSavePrompt;
+    this.onDeletePrompt = onDeletePrompt;
   }
   onOpen() {
     const { contentEl } = this;
+    contentEl.addClass("editor-k-prompt-modal");
     contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
-    const previewDiv = contentEl.createDiv({ cls: "cmd-k-preview" });
+    const mainContainer = contentEl.createDiv({ cls: "editor-k-main-container" });
+    const leftColumn = mainContainer.createDiv({ cls: "editor-k-left-column" });
+    const previewDiv = leftColumn.createDiv({ cls: "cmd-k-preview" });
     previewDiv.createEl("h4", { text: "Selected Text:" });
     const textPreview = this.selectedText.length > 200 ? this.selectedText.substring(0, 200) + "..." : this.selectedText;
     previewDiv.createEl("pre", {
       text: textPreview,
       cls: "cmd-k-selected-text"
     });
-    const promptDiv = contentEl.createDiv({ cls: "cmd-k-prompt" });
-    promptDiv.createEl("h4", { text: "What would you like to do with this text?" });
-    const textArea = new import_obsidian2.TextAreaComponent(promptDiv);
-    textArea.inputEl.style.width = "100%";
-    textArea.inputEl.style.minHeight = "100px";
-    textArea.inputEl.placeholder = 'e.g., "Make it more concise", "Fix grammar", "Translate to Spanish"...';
-    textArea.onChange((value) => {
+    const promptDiv = leftColumn.createDiv({ cls: "cmd-k-prompt" });
+    promptDiv.createEl("h4", { text: "What would you like to do?" });
+    this.textArea = new import_obsidian2.TextAreaComponent(promptDiv);
+    this.textArea.inputEl.style.width = "100%";
+    this.textArea.inputEl.style.minHeight = "100px";
+    this.textArea.inputEl.placeholder = 'e.g., "Make it more concise", "Fix grammar", "Translate to Spanish"...';
+    this.textArea.onChange((value) => {
       this.prompt = value;
     });
-    textArea.inputEl.focus();
+    const savePromptDiv = leftColumn.createDiv({ cls: "editor-k-save-prompt" });
+    const savePromptContainer = savePromptDiv.createDiv({ cls: "editor-k-save-container" });
+    const promptNameInput = new import_obsidian2.TextComponent(savePromptContainer);
+    promptNameInput.setPlaceholder("Prompt name...");
+    promptNameInput.inputEl.style.marginRight = "8px";
+    const categoryInput = new import_obsidian2.TextComponent(savePromptContainer);
+    categoryInput.setPlaceholder("Category (optional)");
+    categoryInput.inputEl.style.marginRight = "8px";
+    const savePromptBtn = new import_obsidian2.ButtonComponent(savePromptContainer);
+    savePromptBtn.setButtonText("Save Prompt").onClick(() => {
+      if (this.prompt.trim() && promptNameInput.getValue().trim()) {
+        const newPrompt = {
+          id: Date.now().toString(),
+          name: promptNameInput.getValue(),
+          prompt: this.prompt,
+          category: categoryInput.getValue() || "General",
+          createdAt: Date.now(),
+          usageCount: 0
+        };
+        this.onSavePrompt(newPrompt);
+        this.updatePromptList();
+        promptNameInput.setValue("");
+        categoryInput.setValue("");
+      }
+    });
+    this.textArea.inputEl.focus();
+    const rightColumn = mainContainer.createDiv({ cls: "editor-k-right-column" });
+    rightColumn.createEl("h4", { text: "Saved Prompts" });
+    this.promptListEl = rightColumn.createDiv({ cls: "editor-k-prompt-list" });
+    this.updatePromptList();
     const buttonDiv = contentEl.createDiv({ cls: "cmd-k-buttons" });
     const submitButton = new import_obsidian2.ButtonComponent(buttonDiv);
     submitButton.setButtonText("Process").setCta().onClick(() => {
@@ -272,8 +387,8 @@ var PromptModal = class extends import_obsidian2.Modal {
     cancelButton.setButtonText("Cancel").onClick(() => {
       this.close();
     });
-    textArea.inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+    this.textArea.inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey && e.ctrlKey) {
         e.preventDefault();
         if (this.prompt.trim()) {
           this.close();
@@ -281,6 +396,60 @@ var PromptModal = class extends import_obsidian2.Modal {
         }
       }
     });
+  }
+  updatePromptList() {
+    this.promptListEl.empty();
+    const promptsByCategory = {};
+    this.savedPrompts.forEach((prompt) => {
+      const category = prompt.category || "General";
+      if (!promptsByCategory[category]) {
+        promptsByCategory[category] = [];
+      }
+      promptsByCategory[category].push(prompt);
+    });
+    Object.keys(promptsByCategory).forEach((category) => {
+      promptsByCategory[category].sort((a, b) => b.usageCount - a.usageCount);
+    });
+    Object.keys(promptsByCategory).sort().forEach((category) => {
+      const categoryEl = this.promptListEl.createDiv({ cls: "editor-k-category" });
+      categoryEl.createEl("h5", { text: category, cls: "editor-k-category-title" });
+      promptsByCategory[category].forEach((savedPrompt) => {
+        const promptItemEl = categoryEl.createDiv({ cls: "editor-k-prompt-item" });
+        const promptContent = promptItemEl.createDiv({ cls: "editor-k-prompt-content" });
+        promptContent.createEl("strong", { text: savedPrompt.name });
+        promptContent.createEl("div", {
+          text: savedPrompt.prompt,
+          cls: "editor-k-prompt-text"
+        });
+        if (savedPrompt.usageCount > 0) {
+          promptContent.createEl("small", {
+            text: `Used ${savedPrompt.usageCount} times`,
+            cls: "editor-k-usage-count"
+          });
+        }
+        const buttonContainer = promptItemEl.createDiv({ cls: "editor-k-prompt-buttons" });
+        const useButton = new import_obsidian2.ButtonComponent(buttonContainer);
+        useButton.setButtonText("Use").setTooltip("Use this prompt").onClick(() => {
+          this.textArea.setValue(savedPrompt.prompt);
+          this.prompt = savedPrompt.prompt;
+          savedPrompt.usageCount++;
+        });
+        const deleteButton = new import_obsidian2.ButtonComponent(buttonContainer);
+        deleteButton.setButtonText("\xD7").setClass("editor-k-delete-btn").setTooltip("Delete this prompt").onClick(() => {
+          if (confirm(`Delete prompt "${savedPrompt.name}"?`)) {
+            this.onDeletePrompt(savedPrompt.id);
+            this.savedPrompts = this.savedPrompts.filter((p) => p.id !== savedPrompt.id);
+            this.updatePromptList();
+          }
+        });
+      });
+    });
+    if (this.savedPrompts.length === 0) {
+      this.promptListEl.createEl("p", {
+        text: "No saved prompts yet. Save your frequently used prompts for quick access!",
+        cls: "editor-k-no-prompts"
+      });
+    }
   }
   onClose() {
     const { contentEl } = this;
@@ -1073,8 +1242,122 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
   }
   loadStyles() {
     const styleEl = document.createElement("style");
-    styleEl.id = "cmd-k-styles";
+    styleEl.id = "editor-k-styles";
     styleEl.textContent = `
+            /* EditorK Plugin Styles */
+
+            /* Modal Layout */
+            .editor-k-prompt-modal {
+                width: 900px;
+                max-width: 90vw;
+            }
+
+            .editor-k-main-container {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 1rem;
+            }
+
+            .editor-k-left-column {
+                flex: 1;
+                min-width: 400px;
+            }
+
+            .editor-k-right-column {
+                width: 300px;
+                border-left: 1px solid var(--background-modifier-border);
+                padding-left: 20px;
+                max-height: 500px;
+                overflow-y: auto;
+            }
+
+            /* Save Prompt Section */
+            .editor-k-save-prompt {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--background-modifier-border);
+            }
+
+            .editor-k-save-container {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* Prompt List */
+            .editor-k-prompt-list {
+                margin-top: 0.5rem;
+            }
+
+            .editor-k-category {
+                margin-bottom: 1rem;
+            }
+
+            .editor-k-category-title {
+                color: var(--text-muted);
+                font-size: 0.9em;
+                margin: 0.5rem 0;
+                font-weight: 600;
+            }
+
+            .editor-k-prompt-item {
+                background: var(--background-secondary);
+                padding: 0.75rem;
+                border-radius: 6px;
+                margin-bottom: 0.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                transition: background 0.2s;
+            }
+
+            .editor-k-prompt-item:hover {
+                background: var(--background-secondary-alt);
+            }
+
+            .editor-k-prompt-content {
+                flex: 1;
+                margin-right: 0.5rem;
+            }
+
+            .editor-k-prompt-content strong {
+                display: block;
+                margin-bottom: 0.25rem;
+                color: var(--text-normal);
+            }
+
+            .editor-k-prompt-text {
+                font-size: 0.85em;
+                color: var(--text-muted);
+                margin-bottom: 0.25rem;
+                line-height: 1.4;
+            }
+
+            .editor-k-usage-count {
+                font-size: 0.75em;
+                color: var(--text-faint);
+            }
+
+            .editor-k-prompt-buttons {
+                display: flex;
+                gap: 4px;
+            }
+
+            .editor-k-delete-btn {
+                background: transparent !important;
+                color: var(--text-error) !important;
+                font-size: 1.2em !important;
+                padding: 0 8px !important;
+                min-width: auto !important;
+            }
+
+            .editor-k-no-prompts {
+                color: var(--text-muted);
+                font-style: italic;
+                text-align: center;
+                padding: 1rem;
+            }
+
             /* CMD-K Plugin Styles */
 
             /* Prompt Modal Styles */
@@ -1195,8 +1478,30 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
     new PromptModal(
       this.app,
       selectedText,
+      this.settings.savedPrompts || [],
       async (prompt) => {
+        if (!this.settings.recentPrompts.includes(prompt)) {
+          this.settings.recentPrompts.unshift(prompt);
+          if (this.settings.recentPrompts.length > this.settings.maxRecentPrompts) {
+            this.settings.recentPrompts.pop();
+          }
+          await this.saveSettings();
+        }
+        const savedPrompt = this.settings.savedPrompts.find((p) => p.prompt === prompt);
+        if (savedPrompt) {
+          savedPrompt.usageCount++;
+          await this.saveSettings();
+        }
         await this.processTextWithAI(editor, selectedText, prompt);
+      },
+      async (newPrompt) => {
+        this.settings.savedPrompts.push(newPrompt);
+        await this.saveSettings();
+        new import_obsidian4.Notice(`Prompt "${newPrompt.name}" saved!`);
+      },
+      async (promptId) => {
+        this.settings.savedPrompts = this.settings.savedPrompts.filter((p) => p.id !== promptId);
+        await this.saveSettings();
       }
     ).open();
   }

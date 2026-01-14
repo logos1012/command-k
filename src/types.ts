@@ -36,6 +36,15 @@ export type GeminiModel = keyof typeof PRICING_PER_MILLION_TOKENS.gemini;
 export type ClaudeModel = keyof typeof PRICING_PER_MILLION_TOKENS.claude;
 export type AIProvider = 'openai' | 'gemini' | 'claude';
 
+export interface SavedPrompt {
+    id: string;
+    name: string;
+    prompt: string;
+    category?: string;
+    createdAt: number;
+    usageCount: number;
+}
+
 export interface CmdKSettings {
     aiProvider: AIProvider;
 
@@ -53,6 +62,11 @@ export interface CmdKSettings {
 
     // General settings
     maxTokens: number;
+
+    // Prompt settings
+    savedPrompts: SavedPrompt[];
+    recentPrompts: string[];
+    maxRecentPrompts: number;
 }
 
 export const DEFAULT_SETTINGS: CmdKSettings = {
@@ -64,6 +78,34 @@ export const DEFAULT_SETTINGS: CmdKSettings = {
     claudeApiKey: '',
     claudeModel: 'claude-3-haiku-20240307',
     maxTokens: 7000,
+    savedPrompts: [
+        {
+            id: '1',
+            name: 'Fix Grammar',
+            prompt: 'Fix grammar and spelling errors',
+            category: 'Writing',
+            createdAt: Date.now(),
+            usageCount: 0
+        },
+        {
+            id: '2',
+            name: 'Make Concise',
+            prompt: 'Make this text more concise while keeping the main points',
+            category: 'Writing',
+            createdAt: Date.now(),
+            usageCount: 0
+        },
+        {
+            id: '3',
+            name: 'Translate to Korean',
+            prompt: 'Translate this text to Korean',
+            category: 'Translation',
+            createdAt: Date.now(),
+            usageCount: 0
+        }
+    ],
+    recentPrompts: [],
+    maxRecentPrompts: 5,
 };
 
 export interface AIRequest {

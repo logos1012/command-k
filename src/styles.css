@@ -1,3 +1,117 @@
+/* EditorK Plugin Styles */
+
+/* Modal Layout */
+.editor-k-prompt-modal {
+    width: 900px;
+    max-width: 90vw;
+}
+
+.editor-k-main-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 1rem;
+}
+
+.editor-k-left-column {
+    flex: 1;
+    min-width: 400px;
+}
+
+.editor-k-right-column {
+    width: 300px;
+    border-left: 1px solid var(--background-modifier-border);
+    padding-left: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Save Prompt Section */
+.editor-k-save-prompt {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.editor-k-save-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Prompt List */
+.editor-k-prompt-list {
+    margin-top: 0.5rem;
+}
+
+.editor-k-category {
+    margin-bottom: 1rem;
+}
+
+.editor-k-category-title {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    margin: 0.5rem 0;
+    font-weight: 600;
+}
+
+.editor-k-prompt-item {
+    background: var(--background-secondary);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    transition: background 0.2s;
+}
+
+.editor-k-prompt-item:hover {
+    background: var(--background-secondary-alt);
+}
+
+.editor-k-prompt-content {
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+.editor-k-prompt-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text-normal);
+}
+
+.editor-k-prompt-text {
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.editor-k-usage-count {
+    font-size: 0.75em;
+    color: var(--text-faint);
+}
+
+.editor-k-prompt-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.editor-k-delete-btn {
+    background: transparent !important;
+    color: var(--text-error) !important;
+    font-size: 1.2em !important;
+    padding: 0 8px !important;
+    min-width: auto !important;
+}
+
+.editor-k-no-prompts {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
 /* CMD-K Plugin Styles */
 
 /* Prompt Modal Styles */
