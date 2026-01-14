@@ -33,20 +33,20 @@ export class PromptModal extends Modal {
 
         // Set modal width directly
         if (modalEl) {
-            modalEl.style.width = '1200px';
-            modalEl.style.maxWidth = '95vw';
+            modalEl.style.width = '800px';
+            modalEl.style.maxWidth = '90vw';
         }
 
         contentEl.createEl('h2', { text: 'EditorK: AI Text Editor' });
 
-        // Create main container with two columns
+        // Create main container with vertical layout
         const mainContainer = contentEl.createDiv({ cls: 'editor-k-main-container' });
 
-        // Left column: Input area
-        const leftColumn = mainContainer.createDiv({ cls: 'editor-k-left-column' });
+        // Top section: Input area
+        const topSection = mainContainer.createDiv({ cls: 'editor-k-top-section' });
 
         // Show selected text preview
-        const previewDiv = leftColumn.createDiv({ cls: 'cmd-k-preview' });
+        const previewDiv = topSection.createDiv({ cls: 'cmd-k-preview' });
         previewDiv.createEl('h4', { text: 'Selected Text:' });
         const textPreview = this.selectedText.length > 200
             ? this.selectedText.substring(0, 200) + '...'
@@ -57,7 +57,7 @@ export class PromptModal extends Modal {
         });
 
         // Prompt input area
-        const promptDiv = leftColumn.createDiv({ cls: 'cmd-k-prompt' });
+        const promptDiv = topSection.createDiv({ cls: 'cmd-k-prompt' });
         promptDiv.createEl('h4', { text: 'What would you like to do?' });
 
         this.textArea = new TextAreaComponent(promptDiv);
@@ -69,7 +69,7 @@ export class PromptModal extends Modal {
         });
 
         // Save prompt section
-        const savePromptDiv = leftColumn.createDiv({ cls: 'editor-k-save-prompt' });
+        const savePromptDiv = topSection.createDiv({ cls: 'editor-k-save-prompt' });
         savePromptDiv.createEl('p', {
             text: 'Save current prompt for quick access later',
             cls: 'editor-k-save-hint'
@@ -115,11 +115,11 @@ export class PromptModal extends Modal {
         // Focus on the textarea when modal opens
         this.textArea.inputEl.focus();
 
-        // Right column: Saved prompts
-        const rightColumn = mainContainer.createDiv({ cls: 'editor-k-right-column' });
-        rightColumn.createEl('h4', { text: 'Saved Prompts' });
+        // Bottom section: Saved prompts
+        const bottomSection = mainContainer.createDiv({ cls: 'editor-k-bottom-section' });
+        bottomSection.createEl('h4', { text: 'Saved Prompts' });
 
-        this.promptListEl = rightColumn.createDiv({ cls: 'editor-k-prompt-list' });
+        this.promptListEl = bottomSection.createDiv({ cls: 'editor-k-prompt-list' });
         this.updatePromptList();
 
         // Submit and Cancel buttons
@@ -180,35 +180,35 @@ export class PromptModal extends Modal {
             const categoryEl = this.promptListEl.createDiv({ cls: 'editor-k-category' });
             categoryEl.createEl('h5', { text: category, cls: 'editor-k-category-title' });
 
+            const categoryItems = categoryEl.createDiv({ cls: 'editor-k-category-items' });
+
             promptsByCategory[category].forEach(savedPrompt => {
-                const promptItemEl = categoryEl.createDiv({ cls: 'editor-k-prompt-item' });
+                const promptItemEl = categoryItems.createDiv({ cls: 'editor-k-prompt-item' });
+
+                // Make the whole item clickable to use the prompt
+                promptItemEl.onclick = (e) => {
+                    // Don't trigger if clicking on delete button
+                    if (!(e.target as HTMLElement).closest('.editor-k-delete-btn')) {
+                        this.textArea.setValue(savedPrompt.prompt);
+                        this.prompt = savedPrompt.prompt;
+                        this.textArea.inputEl.focus();
+                    }
+                };
 
                 const promptContent = promptItemEl.createDiv({ cls: 'editor-k-prompt-content' });
-                promptContent.createEl('strong', { text: savedPrompt.name });
-                promptContent.createEl('div', {
-                    text: savedPrompt.prompt,
-                    cls: 'editor-k-prompt-text'
+                promptContent.createEl('span', {
+                    text: savedPrompt.name,
+                    cls: 'editor-k-prompt-name'
                 });
 
                 if (savedPrompt.usageCount > 0) {
-                    promptContent.createEl('small', {
-                        text: `Used ${savedPrompt.usageCount} times`,
+                    promptContent.createEl('span', {
+                        text: `(${savedPrompt.usageCount})`,
                         cls: 'editor-k-usage-count'
                     });
                 }
 
                 const buttonContainer = promptItemEl.createDiv({ cls: 'editor-k-prompt-buttons' });
-
-                // Use button
-                const useButton = new ButtonComponent(buttonContainer);
-                useButton
-                    .setButtonText('Use')
-                    .setTooltip('Use this prompt')
-                    .onClick(() => {
-                        this.textArea.setValue(savedPrompt.prompt);
-                        this.prompt = savedPrompt.prompt;
-                        // Usage count will be updated when actually submitted
-                    });
 
                 // Delete button
                 const deleteButton = new ButtonComponent(buttonContainer);

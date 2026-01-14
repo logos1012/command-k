@@ -102,37 +102,36 @@ export default class CmdKPlugin extends Plugin {
 
             /* Modal Layout */
             .editor-k-prompt-modal {
-                width: 1200px !important;
-                max-width: 95vw !important;
+                width: 800px !important;
+                max-width: 90vw !important;
             }
 
             .modal:has(.editor-k-prompt-modal) {
-                width: 1200px !important;
-                max-width: 95vw !important;
+                width: 800px !important;
+                max-width: 90vw !important;
             }
 
             .modal-container:has(.editor-k-prompt-modal) {
-                width: 1200px !important;
-                max-width: 95vw !important;
+                width: 800px !important;
+                max-width: 90vw !important;
             }
 
             .editor-k-main-container {
                 display: flex;
+                flex-direction: column;
                 gap: 20px;
                 margin-bottom: 1rem;
             }
 
-            .editor-k-left-column {
-                flex: 1;
-                min-width: 600px;
+            .editor-k-top-section {
+                width: 100%;
             }
 
-            .editor-k-right-column {
-                width: 450px;
-                flex-shrink: 0;
-                border-left: 1px solid var(--background-modifier-border);
-                padding-left: 20px;
-                max-height: 600px;
+            .editor-k-bottom-section {
+                width: 100%;
+                border-top: 1px solid var(--background-modifier-border);
+                padding-top: 20px;
+                max-height: 300px;
                 overflow-y: auto;
             }
 
@@ -166,25 +165,32 @@ export default class CmdKPlugin extends Plugin {
             }
 
             .editor-k-category {
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }
 
             .editor-k-category-title {
                 color: var(--text-muted);
                 font-size: 0.9em;
-                margin: 0.5rem 0;
+                margin: 0 0 0.75rem 0;
                 font-weight: 600;
+            }
+
+            .editor-k-category-items {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
             .editor-k-prompt-item {
                 background: var(--background-secondary);
-                padding: 0.75rem;
+                padding: 0.5rem 0.75rem;
                 border-radius: 6px;
-                margin-bottom: 0.5rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
                 transition: background 0.2s;
+                cursor: pointer;
+                flex-shrink: 0;
             }
 
             .editor-k-prompt-item:hover {
@@ -192,34 +198,27 @@ export default class CmdKPlugin extends Plugin {
             }
 
             .editor-k-prompt-content {
-                flex: 1;
-                margin-right: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
-            .editor-k-prompt-content strong {
-                display: block;
-                margin-bottom: 0.25rem;
+            .editor-k-prompt-name {
+                font-weight: 500;
                 color: var(--text-normal);
-            }
-
-            .editor-k-prompt-text {
-                font-size: 0.85em;
-                color: var(--text-muted);
-                margin-bottom: 0.25rem;
-                line-height: 1.4;
-                white-space: pre-wrap;
-                word-break: break-word;
-                overflow-wrap: break-word;
+                white-space: nowrap;
             }
 
             .editor-k-usage-count {
                 font-size: 0.75em;
                 color: var(--text-faint);
+                white-space: nowrap;
             }
 
             .editor-k-prompt-buttons {
                 display: flex;
                 gap: 4px;
+                align-items: center;
             }
 
             .editor-k-delete-btn {
