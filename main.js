@@ -155,14 +155,18 @@ var PromptManagementModal = class extends import_obsidian.Modal {
     this.onSave = onSave;
   }
   onOpen() {
+    this.renderContent();
+  }
+  renderContent() {
     const { contentEl } = this;
+    contentEl.empty();
     contentEl.createEl("h2", { text: "Manage Saved Prompts" });
     const promptList = contentEl.createDiv({ cls: "prompt-management-list" });
     this.prompts.forEach((prompt, index) => {
       const promptItem = promptList.createDiv({ cls: "prompt-management-item" });
       new import_obsidian.Setting(promptItem).setName(prompt.name).setDesc(`${prompt.prompt} (Used ${prompt.usageCount} times)`).addButton((btn) => btn.setButtonText("Delete").setWarning().onClick(() => {
         this.prompts.splice(index, 1);
-        this.onOpen();
+        this.renderContent();
       }));
     });
     const buttonDiv = contentEl.createDiv({ cls: "modal-button-container" });
@@ -1574,6 +1578,7 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
         await this.processTextWithAI(editor, selectedText, prompt);
       },
       async (newPrompt) => {
+        this.settings.savedPrompts.push(newPrompt);
         await this.saveSettings();
         new import_obsidian4.Notice(`Prompt "${newPrompt.name}" saved!`);
       },

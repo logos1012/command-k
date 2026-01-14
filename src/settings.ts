@@ -67,7 +67,13 @@ class PromptManagementModal extends Modal {
     }
 
     onOpen() {
+        this.renderContent();
+    }
+
+    private renderContent() {
         const { contentEl } = this;
+        contentEl.empty(); // Clear previous content
+
         contentEl.createEl('h2', { text: 'Manage Saved Prompts' });
 
         const promptList = contentEl.createDiv({ cls: 'prompt-management-list' });
@@ -83,7 +89,7 @@ class PromptManagementModal extends Modal {
                     .setWarning()
                     .onClick(() => {
                         this.prompts.splice(index, 1);
-                        this.onOpen(); // Refresh display
+                        this.renderContent(); // Refresh display
                     }));
         });
 

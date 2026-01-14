@@ -413,7 +413,8 @@ export default class CmdKPlugin extends Plugin {
                 await this.processTextWithAI(editor, selectedText, prompt);
             },
             async (newPrompt) => {
-                // Save to settings (modal already added to its local list)
+                // Add to settings (modal already added to its local list)
+                this.settings.savedPrompts.push(newPrompt);
                 await this.saveSettings();
                 new Notice(`Prompt "${newPrompt.name}" saved!`);
             },
