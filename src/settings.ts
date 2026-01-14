@@ -67,7 +67,7 @@ export class CmdKSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'CMD-K Settings' });
+        containerEl.createEl('h2', { text: 'EditorK Settings' });
 
         // AI Provider Selection
         new Setting(containerEl)
@@ -210,10 +210,14 @@ export class CmdKSettingTab extends PluginSettingTab {
         containerEl.createEl('h3', { text: 'Keyboard Shortcuts' });
         const shortcutInfo = containerEl.createDiv();
         shortcutInfo.createEl('p', {
-            text: 'Default shortcut: Cmd/Ctrl + K (when text is selected)'
+            text: 'Default shortcuts:'
         });
+        shortcutInfo.createEl('ul').innerHTML = `
+            <li><strong>Ctrl + Shift + K</strong>: Edit selected text with AI</li>
+            <li><strong>Alt + E</strong>: Alternative shortcut for editing</li>
+        `;
         shortcutInfo.createEl('p', {
-            text: 'You can customize this in Settings → Hotkeys → Search for "CMD-K"'
+            text: 'You can customize these in Settings → Hotkeys → Search for "EditorK"'
         });
     }
 }

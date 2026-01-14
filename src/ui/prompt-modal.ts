@@ -14,7 +14,7 @@ export class PromptModal extends Modal {
     onOpen() {
         const { contentEl } = this;
 
-        contentEl.createEl('h2', { text: 'CMD-K: AI Text Editor' });
+        contentEl.createEl('h2', { text: 'EditorK: AI Text Editor' });
 
         // Show selected text preview (truncated if too long)
         const previewDiv = contentEl.createDiv({ cls: 'cmd-k-preview' });

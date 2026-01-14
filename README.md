@@ -1,4 +1,4 @@
-# CMD-K for Obsidian
+# EditorK for Obsidian
 
 AI-powered text editing plugin for Obsidian, inspired by Cursor IDE's CMD+K feature.
 
@@ -21,19 +21,20 @@ AI-powered text editing plugin for Obsidian, inspired by Cursor IDE's CMD+K feat
 ### Manual Installation
 
 1. Download `main.js`, `manifest.json` from the latest release
-2. Create a folder named `cmd-k` in your vault's `.obsidian/plugins/` directory
+2. Create a folder named `editor-k` in your vault's `.obsidian/plugins/` directory
 3. Copy the downloaded files into the `cmd-k` folder
 4. Reload Obsidian
 5. Enable the plugin in Settings → Community plugins
 
 ## Usage
 
-1. **Configure AI Provider**: Go to Settings → CMD-K and set up your preferred AI provider with API key
+1. **Configure AI Provider**: Go to Settings → EditorK and set up your preferred AI provider with API key
 2. **Select Text**: Highlight any text in your note that you want to modify
 3. **Activate**: Use one of these methods:
-   - Press `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux)
+   - Press `Ctrl+Shift+K` (default shortcut)
+   - Press `Alt+E` (alternative shortcut)
    - Click the wand icon in the ribbon
-   - Use Command Palette: "CMD-K: Edit selected text with AI"
+   - Use Command Palette: "EditorK: Edit selected text with AI"
 4. **Enter Prompt**: Describe what you want to do with the selected text
 5. **Review Changes**: See the diff view with additions in green and deletions in red
 6. **Accept or Reject**: Click Accept to apply changes or Reject to cancel

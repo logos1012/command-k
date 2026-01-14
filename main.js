@@ -128,7 +128,7 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "CMD-K Settings" });
+    containerEl.createEl("h2", { text: "EditorK Settings" });
     new import_obsidian.Setting(containerEl).setName("AI Provider").setDesc("Select the AI provider to use for text editing").addDropdown((dropdown) => dropdown.addOption("openai", "OpenAI (ChatGPT)").addOption("gemini", "Google Gemini").addOption("claude", "Anthropic Claude").setValue(this.plugin.settings.aiProvider).onChange(async (value) => {
       this.plugin.settings.aiProvider = value;
       await this.plugin.saveSettings();
@@ -219,10 +219,14 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.createEl("h3", { text: "Keyboard Shortcuts" });
     const shortcutInfo = containerEl.createDiv();
     shortcutInfo.createEl("p", {
-      text: "Default shortcut: Cmd/Ctrl + K (when text is selected)"
+      text: "Default shortcuts:"
     });
+    shortcutInfo.createEl("ul").innerHTML = `
+            <li><strong>Ctrl + Shift + K</strong>: Edit selected text with AI</li>
+            <li><strong>Alt + E</strong>: Alternative shortcut for editing</li>
+        `;
     shortcutInfo.createEl("p", {
-      text: 'You can customize this in Settings \u2192 Hotkeys \u2192 Search for "CMD-K"'
+      text: 'You can customize these in Settings \u2192 Hotkeys \u2192 Search for "EditorK"'
     });
   }
 };
@@ -238,7 +242,7 @@ var PromptModal = class extends import_obsidian2.Modal {
   }
   onOpen() {
     const { contentEl } = this;
-    contentEl.createEl("h2", { text: "CMD-K: AI Text Editor" });
+    contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
     const previewDiv = contentEl.createDiv({ cls: "cmd-k-preview" });
     previewDiv.createEl("h4", { text: "Selected Text:" });
     const textPreview = this.selectedText.length > 200 ? this.selectedText.substring(0, 200) + "..." : this.selectedText;
@@ -1026,21 +1030,34 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
     this.loadStyles();
     this.ribbonIcon = this.addRibbonIcon(
       "wand-2",
-      "CMD-K: Edit with AI",
+      "EditorK: Edit with AI",
       (evt) => {
-        this.handleCmdK();
+        this.handleEditorK();
       }
     );
     this.addCommand({
-      id: "cmd-k-edit",
+      id: "editor-k-edit",
       name: "Edit selected text with AI",
       editorCallback: (editor, view) => {
-        this.handleCmdKFromEditor(editor);
+        this.handleEditorKFromEditor(editor);
       },
       hotkeys: [
         {
-          modifiers: ["Mod"],
+          modifiers: ["Ctrl", "Shift"],
           key: "k"
+        }
+      ]
+    });
+    this.addCommand({
+      id: "editor-k-edit-alt",
+      name: "Edit selected text with AI (Alternative)",
+      editorCallback: (editor, view) => {
+        this.handleEditorKFromEditor(editor);
+      },
+      hotkeys: [
+        {
+          modifiers: ["Alt"],
+          key: "e"
         }
       ]
     });
@@ -1160,16 +1177,16 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
         `;
     document.head.appendChild(styleEl);
   }
-  handleCmdK() {
+  handleEditorK() {
     const view = this.app.workspace.getActiveViewOfType(import_obsidian4.MarkdownView);
     if (view) {
       const editor = view.editor;
-      this.handleCmdKFromEditor(editor);
+      this.handleEditorKFromEditor(editor);
     } else {
       new import_obsidian4.Notice("Please open a note and select some text first");
     }
   }
-  handleCmdKFromEditor(editor) {
+  handleEditorKFromEditor(editor) {
     const selectedText = editor.getSelection();
     if (!selectedText) {
       new import_obsidian4.Notice("Please select some text first");

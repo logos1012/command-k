@@ -29,23 +29,38 @@ export default class CmdKPlugin extends Plugin {
         // Add ribbon icon
         this.ribbonIcon = this.addRibbonIcon(
             'wand-2',
-            'CMD-K: Edit with AI',
+            'EditorK: Edit with AI',
             (evt: MouseEvent) => {
-                this.handleCmdK();
+                this.handleEditorK();
             }
         );
 
         // Add command to command palette
         this.addCommand({
-            id: 'cmd-k-edit',
+            id: 'editor-k-edit',
             name: 'Edit selected text with AI',
             editorCallback: (editor: Editor, view: MarkdownView) => {
-                this.handleCmdKFromEditor(editor);
+                this.handleEditorKFromEditor(editor);
             },
             hotkeys: [
                 {
-                    modifiers: ['Mod'],
+                    modifiers: ['Ctrl', 'Shift'],
                     key: 'k',
+                },
+            ],
+        });
+
+        // Add alternative command with different shortcut
+        this.addCommand({
+            id: 'editor-k-edit-alt',
+            name: 'Edit selected text with AI (Alternative)',
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                this.handleEditorKFromEditor(editor);
+            },
+            hotkeys: [
+                {
+                    modifiers: ['Alt'],
+                    key: 'e',
                 },
             ],
         });
@@ -174,17 +189,17 @@ export default class CmdKPlugin extends Plugin {
         document.head.appendChild(styleEl);
     }
 
-    private handleCmdK() {
+    private handleEditorK() {
         const view = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (view) {
             const editor = view.editor;
-            this.handleCmdKFromEditor(editor);
+            this.handleEditorKFromEditor(editor);
         } else {
             new Notice('Please open a note and select some text first');
         }
     }
 
-    private handleCmdKFromEditor(editor: Editor) {
+    private handleEditorKFromEditor(editor: Editor) {
         const selectedText = editor.getSelection();
 
         if (!selectedText) {
