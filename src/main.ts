@@ -102,8 +102,13 @@ export default class CmdKPlugin extends Plugin {
 
             /* Modal Layout */
             .editor-k-prompt-modal {
-                width: 900px;
-                max-width: 90vw;
+                width: 1200px;
+                max-width: 95vw;
+            }
+
+            .editor-k-prompt-modal .modal {
+                width: 1200px;
+                max-width: 95vw;
             }
 
             .editor-k-main-container {
@@ -114,14 +119,14 @@ export default class CmdKPlugin extends Plugin {
 
             .editor-k-left-column {
                 flex: 1;
-                min-width: 400px;
+                min-width: 500px;
             }
 
             .editor-k-right-column {
-                width: 300px;
+                width: 400px;
                 border-left: 1px solid var(--background-modifier-border);
                 padding-left: 20px;
-                max-height: 500px;
+                max-height: 600px;
                 overflow-y: auto;
             }
 
@@ -367,7 +372,7 @@ export default class CmdKPlugin extends Plugin {
                 // Save new prompt
                 this.settings.savedPrompts.push(newPrompt);
                 await this.saveSettings();
-                new Notice(`프롬프트 "${newPrompt.name}" 저장됨!`);
+                new Notice(`Prompt "${newPrompt.name}" saved!`);
                 // Update the modal's saved prompts list
                 modal.savedPrompts = this.settings.savedPrompts;
             },
@@ -375,7 +380,7 @@ export default class CmdKPlugin extends Plugin {
                 // Delete prompt
                 this.settings.savedPrompts = this.settings.savedPrompts.filter(p => p.id !== promptId);
                 await this.saveSettings();
-                new Notice('프롬프트가 삭제되었습니다');
+                new Notice('Prompt deleted');
             }
         );
         modal.open();
