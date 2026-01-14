@@ -396,12 +396,9 @@ export default class CmdKPlugin extends Plugin {
                 await this.processTextWithAI(editor, selectedText, prompt);
             },
             async (newPrompt) => {
-                // Save new prompt
-                this.settings.savedPrompts.push(newPrompt);
+                // Save to settings (modal already added to its local list)
                 await this.saveSettings();
                 new Notice(`Prompt "${newPrompt.name}" saved!`);
-                // Update the modal's saved prompts list
-                modal.savedPrompts = this.settings.savedPrompts;
             },
             async (promptId) => {
                 // Delete prompt

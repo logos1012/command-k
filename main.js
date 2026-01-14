@@ -369,7 +369,7 @@ var PromptModal = class extends import_obsidian2.Modal {
     categoryInput.inputEl.style.width = "150px";
     categoryInput.inputEl.style.marginRight = "8px";
     const savePromptBtn = new import_obsidian2.ButtonComponent(savePromptContainer);
-    savePromptBtn.setButtonText("Save").onClick(() => {
+    savePromptBtn.setButtonText("Save").onClick(async () => {
       if (this.prompt.trim() && promptNameInput.getValue().trim()) {
         const newPrompt = {
           id: Date.now().toString(),
@@ -379,7 +379,8 @@ var PromptModal = class extends import_obsidian2.Modal {
           createdAt: Date.now(),
           usageCount: 0
         };
-        this.onSavePrompt(newPrompt);
+        this.savedPrompts.push(newPrompt);
+        await this.onSavePrompt(newPrompt);
         this.updatePromptList();
         promptNameInput.setValue("");
         categoryInput.setValue("");
@@ -1565,10 +1566,8 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
         await this.processTextWithAI(editor, selectedText, prompt);
       },
       async (newPrompt) => {
-        this.settings.savedPrompts.push(newPrompt);
         await this.saveSettings();
         new import_obsidian4.Notice(`Prompt "${newPrompt.name}" saved!`);
-        modal.savedPrompts = this.settings.savedPrompts;
       },
       async (promptId) => {
         this.settings.savedPrompts = this.settings.savedPrompts.filter((p) => p.id !== promptId);

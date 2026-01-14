@@ -1,7 +1,7 @@
 {
 	"id": "editor-k",
 	"name": "EditorK",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"minAppVersion": "0.15.0",
 	"description": "AI-powered text editing for Obsidian, inspired by Cursor IDE's CMD+K",
 	"author": "Jake",

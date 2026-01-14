@@ -95,7 +95,7 @@ export class PromptModal extends Modal {
         const savePromptBtn = new ButtonComponent(savePromptContainer);
         savePromptBtn
             .setButtonText('Save')
-            .onClick(() => {
+            .onClick(async () => {
                 if (this.prompt.trim() && promptNameInput.getValue().trim()) {
                     const newPrompt: SavedPrompt = {
                         id: Date.now().toString(),
@@ -105,9 +105,17 @@ export class PromptModal extends Modal {
                         createdAt: Date.now(),
                         usageCount: 0
                     };
-                    this.onSavePrompt(newPrompt);
-                    // Reload the saved prompts from settings
+
+                    // Add to local list immediately
+                    this.savedPrompts.push(newPrompt);
+
+                    // Save to settings
+                    await this.onSavePrompt(newPrompt);
+
+                    // Update the display
                     this.updatePromptList();
+
+                    // Clear inputs
                     promptNameInput.setValue('');
                     categoryInput.setValue('');
                 } else if (!this.prompt.trim()) {
@@ -162,7 +170,7 @@ export class PromptModal extends Modal {
         });
     }
 
-    private updatePromptList() {
+    public updatePromptList() {
         this.promptListEl.empty();
 
         // Group prompts by category
