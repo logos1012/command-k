@@ -1,0 +1,108 @@
+/* CMD-K Plugin Styles */
+
+/* Prompt Modal Styles */
+.cmd-k-preview {
+    margin-bottom: 1rem;
+}
+
+.cmd-k-selected-text {
+    background-color: var(--background-secondary);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    max-height: 150px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.cmd-k-prompt {
+    margin-bottom: 1rem;
+}
+
+.cmd-k-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Diff Viewer Styles */
+.cmd-k-diff-container {
+    margin: 1rem 0;
+}
+
+.cmd-k-diff-display {
+    background-color: var(--background-secondary);
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: var(--font-monospace);
+    font-size: 0.9em;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.cmd-k-diff-added {
+    background-color: rgba(0, 255, 0, 0.2);
+    color: var(--text-success);
+    text-decoration: none;
+}
+
+.cmd-k-diff-removed {
+    background-color: rgba(255, 0, 0, 0.2);
+    color: var(--text-error);
+    text-decoration: line-through;
+}
+
+.cmd-k-diff-unchanged {
+    color: var(--text-normal);
+}
+
+.cmd-k-diff-stats {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Loading indicator */
+.cmd-k-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.cmd-k-loading-spinner {
+    border: 3px solid var(--background-modifier-border);
+    border-top: 3px solid var(--interactive-accent);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: cmd-k-spin 1s linear infinite;
+}
+
+@keyframes cmd-k-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Settings styles */
+.cmd-k-setting-item {
+    margin-bottom: 1.5rem;
+}
+
+.cmd-k-api-key-input {
+    font-family: var(--font-monospace);
+}
+
+/* Error styles */
+.cmd-k-error {
+    background-color: var(--background-modifier-error);
+    color: var(--text-error);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}

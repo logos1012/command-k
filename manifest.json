@@ -1,0 +1,11 @@
+{
+	"id": "cmd-k",
+	"name": "CMD-K",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "AI-powered text editing for Obsidian, inspired by Cursor IDE's CMD+K",
+	"author": "Jake",
+	"authorUrl": "",
+	"fundingUrl": "",
+	"isDesktopOnly": false
+}
