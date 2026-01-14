@@ -102,13 +102,18 @@ export default class CmdKPlugin extends Plugin {
 
             /* Modal Layout */
             .editor-k-prompt-modal {
-                width: 1200px;
-                max-width: 95vw;
+                width: 1200px !important;
+                max-width: 95vw !important;
             }
 
-            .editor-k-prompt-modal .modal {
-                width: 1200px;
-                max-width: 95vw;
+            .modal:has(.editor-k-prompt-modal) {
+                width: 1200px !important;
+                max-width: 95vw !important;
+            }
+
+            .modal-container:has(.editor-k-prompt-modal) {
+                width: 1200px !important;
+                max-width: 95vw !important;
             }
 
             .editor-k-main-container {
@@ -119,11 +124,12 @@ export default class CmdKPlugin extends Plugin {
 
             .editor-k-left-column {
                 flex: 1;
-                min-width: 500px;
+                min-width: 600px;
             }
 
             .editor-k-right-column {
-                width: 400px;
+                width: 450px;
+                flex-shrink: 0;
                 border-left: 1px solid var(--background-modifier-border);
                 padding-left: 20px;
                 max-height: 600px;
@@ -147,6 +153,11 @@ export default class CmdKPlugin extends Plugin {
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                flex-wrap: nowrap;
+            }
+
+            .editor-k-save-container input[type="text"] {
+                box-sizing: border-box;
             }
 
             /* Prompt List */
@@ -196,6 +207,9 @@ export default class CmdKPlugin extends Plugin {
                 color: var(--text-muted);
                 margin-bottom: 0.25rem;
                 line-height: 1.4;
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: break-word;
             }
 
             .editor-k-usage-count {
@@ -239,10 +253,18 @@ export default class CmdKPlugin extends Plugin {
                 overflow-y: auto;
                 white-space: pre-wrap;
                 word-break: break-word;
+                overflow-x: hidden;
             }
 
             .cmd-k-prompt {
                 margin-bottom: 1rem;
+            }
+
+            .cmd-k-prompt textarea {
+                width: 100% !important;
+                min-height: 100px !important;
+                resize: vertical;
+                box-sizing: border-box;
             }
 
             .cmd-k-buttons {
