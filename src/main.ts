@@ -109,11 +109,17 @@ export default class CmdKPlugin extends Plugin {
             .modal:has(.editor-k-prompt-modal) {
                 width: 800px !important;
                 max-width: 90vw !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
             }
 
             .modal-container:has(.editor-k-prompt-modal) {
                 width: 800px !important;
                 max-width: 90vw !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
             }
 
             .editor-k-main-container {

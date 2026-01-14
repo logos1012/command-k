@@ -329,6 +329,11 @@ var PromptModal = class extends import_obsidian2.Modal {
     if (modalEl) {
       modalEl.style.width = "800px";
       modalEl.style.maxWidth = "90vw";
+      modalEl.style.left = "50%";
+      modalEl.style.right = "auto";
+      modalEl.style.transform = "translateX(-50%)";
+      modalEl.style.marginLeft = "0";
+      modalEl.style.marginRight = "0";
     }
     contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
     const mainContainer = contentEl.createDiv({ cls: "editor-k-main-container" });
@@ -1282,11 +1287,17 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
             .modal:has(.editor-k-prompt-modal) {
                 width: 800px !important;
                 max-width: 90vw !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
             }
 
             .modal-container:has(.editor-k-prompt-modal) {
                 width: 800px !important;
                 max-width: 90vw !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%) !important;
             }
 
             .editor-k-main-container {
