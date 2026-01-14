@@ -377,7 +377,6 @@ var PromptModal = class extends import_obsidian2.Modal {
           createdAt: Date.now(),
           usageCount: 0
         };
-        this.savedPrompts.push(newPrompt);
         await this.onSavePrompt(newPrompt);
         this.updatePromptList();
         promptNameInput.setValue("");

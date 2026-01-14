@@ -100,10 +100,7 @@ export class PromptModal extends Modal {
                         usageCount: 0
                     };
 
-                    // Add to local list immediately
-                    this.savedPrompts.push(newPrompt);
-
-                    // Save to settings
+                    // Save to settings (onSavePrompt will add to the array)
                     await this.onSavePrompt(newPrompt);
 
                     // Update the display
