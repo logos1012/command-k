@@ -28,19 +28,8 @@ export class PromptModal extends Modal {
     }
 
     onOpen() {
-        const { contentEl, modalEl } = this;
+        const { contentEl } = this;
         contentEl.addClass('editor-k-prompt-modal');
-
-        // Set modal width and position directly
-        if (modalEl) {
-            modalEl.style.width = '800px';
-            modalEl.style.maxWidth = '90vw';
-            modalEl.style.left = '50%';
-            modalEl.style.right = 'auto';
-            modalEl.style.transform = 'translateX(-50%)';
-            modalEl.style.marginLeft = '0';
-            modalEl.style.marginRight = '0';
-        }
 
         contentEl.createEl('h2', { text: 'EditorK: AI Text Editor' });
 

@@ -324,17 +324,8 @@ var PromptModal = class extends import_obsidian2.Modal {
     this.onDeletePrompt = onDeletePrompt;
   }
   onOpen() {
-    const { contentEl, modalEl } = this;
+    const { contentEl } = this;
     contentEl.addClass("editor-k-prompt-modal");
-    if (modalEl) {
-      modalEl.style.width = "800px";
-      modalEl.style.maxWidth = "90vw";
-      modalEl.style.left = "50%";
-      modalEl.style.right = "auto";
-      modalEl.style.transform = "translateX(-50%)";
-      modalEl.style.marginLeft = "0";
-      modalEl.style.marginRight = "0";
-    }
     contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
     const mainContainer = contentEl.createDiv({ cls: "editor-k-main-container" });
     const topSection = mainContainer.createDiv({ cls: "editor-k-top-section" });
@@ -1280,25 +1271,42 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
             /* EditorK Plugin Styles */
 
             /* Modal Layout */
-            .editor-k-prompt-modal {
-                width: 800px !important;
-                max-width: 90vw !important;
+            .modal-bg:has(+ .modal-container .editor-k-prompt-modal) {
+                opacity: 0.85 !important;
+            }
+
+            .modal-container:has(.editor-k-prompt-modal) {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+                z-index: 100 !important;
             }
 
             .modal:has(.editor-k-prompt-modal) {
                 width: 800px !important;
-                max-width: 90vw !important;
-                left: 50% !important;
+                max-width: calc(100vw - 40px) !important;
+                max-height: calc(100vh - 40px) !important;
+                overflow-y: auto !important;
+                position: relative !important;
+                left: auto !important;
                 right: auto !important;
-                transform: translateX(-50%) !important;
+                top: auto !important;
+                bottom: auto !important;
+                transform: none !important;
+                margin: 0 !important;
             }
 
-            .modal-container:has(.editor-k-prompt-modal) {
-                width: 800px !important;
-                max-width: 90vw !important;
-                left: 50% !important;
-                right: auto !important;
-                transform: translateX(-50%) !important;
+            .editor-k-prompt-modal {
+                width: 100% !important;
             }
 
             .editor-k-main-container {
