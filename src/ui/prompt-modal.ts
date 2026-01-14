@@ -41,7 +41,7 @@ export class PromptModal extends Modal {
 
         // Show selected text preview
         const previewDiv = leftColumn.createDiv({ cls: 'cmd-k-preview' });
-        previewDiv.createEl('h4', { text: 'Selected Text:' });
+        previewDiv.createEl('h4', { text: '📄 선택된 텍스트:' });
         const textPreview = this.selectedText.length > 200
             ? this.selectedText.substring(0, 200) + '...'
             : this.selectedText;
@@ -52,31 +52,38 @@ export class PromptModal extends Modal {
 
         // Prompt input area
         const promptDiv = leftColumn.createDiv({ cls: 'cmd-k-prompt' });
-        promptDiv.createEl('h4', { text: 'What would you like to do?' });
+        promptDiv.createEl('h4', { text: '✍️ 무엇을 하시겠습니까?' });
 
         this.textArea = new TextAreaComponent(promptDiv);
         this.textArea.inputEl.style.width = '100%';
         this.textArea.inputEl.style.minHeight = '100px';
-        this.textArea.inputEl.placeholder = 'e.g., "Make it more concise", "Fix grammar", "Translate to Spanish"...';
+        this.textArea.inputEl.placeholder = '예: "더 간결하게 만들어줘", "문법 교정", "한글로 번역"...';
         this.textArea.onChange(value => {
             this.prompt = value;
         });
 
-        // Save prompt button and input
+        // Save prompt section
         const savePromptDiv = leftColumn.createDiv({ cls: 'editor-k-save-prompt' });
+        savePromptDiv.createEl('p', {
+            text: '💾 현재 프롬프트를 저장하려면 아래에 이름을 입력하세요',
+            cls: 'editor-k-save-hint'
+        });
+
         const savePromptContainer = savePromptDiv.createDiv({ cls: 'editor-k-save-container' });
 
         const promptNameInput = new TextComponent(savePromptContainer);
-        promptNameInput.setPlaceholder('Prompt name...');
+        promptNameInput.setPlaceholder('예: 문법 교정, 번역하기...');
+        promptNameInput.inputEl.style.flex = '1';
         promptNameInput.inputEl.style.marginRight = '8px';
 
         const categoryInput = new TextComponent(savePromptContainer);
-        categoryInput.setPlaceholder('Category (optional)');
+        categoryInput.setPlaceholder('카테고리 (선택)');
+        categoryInput.inputEl.style.width = '150px';
         categoryInput.inputEl.style.marginRight = '8px';
 
         const savePromptBtn = new ButtonComponent(savePromptContainer);
         savePromptBtn
-            .setButtonText('Save Prompt')
+            .setButtonText('저장')
             .onClick(() => {
                 if (this.prompt.trim() && promptNameInput.getValue().trim()) {
                     const newPrompt: SavedPrompt = {
@@ -88,9 +95,14 @@ export class PromptModal extends Modal {
                         usageCount: 0
                     };
                     this.onSavePrompt(newPrompt);
+                    // Reload the saved prompts from settings
                     this.updatePromptList();
                     promptNameInput.setValue('');
                     categoryInput.setValue('');
+                } else if (!this.prompt.trim()) {
+                    alert('프롬프트를 먼저 입력하세요!');
+                } else {
+                    alert('프롬프트 이름을 입력하세요!');
                 }
             });
 
@@ -99,7 +111,7 @@ export class PromptModal extends Modal {
 
         // Right column: Saved prompts
         const rightColumn = mainContainer.createDiv({ cls: 'editor-k-right-column' });
-        rightColumn.createEl('h4', { text: 'Saved Prompts' });
+        rightColumn.createEl('h4', { text: '📚 저장된 프롬프트' });
 
         this.promptListEl = rightColumn.createDiv({ cls: 'editor-k-prompt-list' });
         this.updatePromptList();
@@ -109,18 +121,20 @@ export class PromptModal extends Modal {
 
         const submitButton = new ButtonComponent(buttonDiv);
         submitButton
-            .setButtonText('Process')
+            .setButtonText('AI로 처리')
             .setCta()
             .onClick(() => {
                 if (this.prompt.trim()) {
                     this.close();
                     this.onSubmit(this.prompt);
+                } else {
+                    alert('프롬프트를 입력하세요!');
                 }
             });
 
         const cancelButton = new ButtonComponent(buttonDiv);
         cancelButton
-            .setButtonText('Cancel')
+            .setButtonText('취소')
             .onClick(() => {
                 this.close();
             });
@@ -182,13 +196,12 @@ export class PromptModal extends Modal {
                 // Use button
                 const useButton = new ButtonComponent(buttonContainer);
                 useButton
-                    .setButtonText('Use')
-                    .setTooltip('Use this prompt')
+                    .setButtonText('사용')
+                    .setTooltip('이 프롬프트 사용하기')
                     .onClick(() => {
                         this.textArea.setValue(savedPrompt.prompt);
                         this.prompt = savedPrompt.prompt;
-                        // Update usage count
-                        savedPrompt.usageCount++;
+                        // Usage count will be updated when actually submitted
                     });
 
                 // Delete button
@@ -196,9 +209,9 @@ export class PromptModal extends Modal {
                 deleteButton
                     .setButtonText('×')
                     .setClass('editor-k-delete-btn')
-                    .setTooltip('Delete this prompt')
+                    .setTooltip('이 프롬프트 삭제하기')
                     .onClick(() => {
-                        if (confirm(`Delete prompt "${savedPrompt.name}"?`)) {
+                        if (confirm(`"${savedPrompt.name}" 프롬프트를 삭제하시겠습니까?`)) {
                             this.onDeletePrompt(savedPrompt.id);
                             this.savedPrompts = this.savedPrompts.filter(p => p.id !== savedPrompt.id);
                             this.updatePromptList();
@@ -209,7 +222,7 @@ export class PromptModal extends Modal {
 
         if (this.savedPrompts.length === 0) {
             this.promptListEl.createEl('p', {
-                text: 'No saved prompts yet. Save your frequently used prompts for quick access!',
+                text: '아직 저장된 프롬프트가 없습니다. 자주 사용하는 프롬프트를 저장하면 빠르게 사용할 수 있습니다!',
                 cls: 'editor-k-no-prompts'
             });
         }

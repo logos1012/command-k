@@ -74,7 +74,19 @@ export default class CmdKPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const data = await this.loadData();
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+
+        // Ensure savedPrompts and recentPrompts are arrays
+        if (!Array.isArray(this.settings.savedPrompts)) {
+            this.settings.savedPrompts = DEFAULT_SETTINGS.savedPrompts;
+        }
+        if (!Array.isArray(this.settings.recentPrompts)) {
+            this.settings.recentPrompts = [];
+        }
+        if (!this.settings.maxRecentPrompts) {
+            this.settings.maxRecentPrompts = 5;
+        }
     }
 
     async saveSettings() {
@@ -118,6 +130,12 @@ export default class CmdKPlugin extends Plugin {
                 margin-top: 1rem;
                 padding-top: 1rem;
                 border-top: 1px solid var(--background-modifier-border);
+            }
+
+            .editor-k-save-hint {
+                font-size: 0.9em;
+                color: var(--text-muted);
+                margin-bottom: 0.5rem;
             }
 
             .editor-k-save-container {
@@ -322,7 +340,7 @@ export default class CmdKPlugin extends Plugin {
         }
 
         // Open prompt modal with saved prompts support
-        new PromptModal(
+        const modal = new PromptModal(
             this.app,
             selectedText,
             this.settings.savedPrompts || [],
@@ -349,14 +367,18 @@ export default class CmdKPlugin extends Plugin {
                 // Save new prompt
                 this.settings.savedPrompts.push(newPrompt);
                 await this.saveSettings();
-                new Notice(`Prompt "${newPrompt.name}" saved!`);
+                new Notice(`프롬프트 "${newPrompt.name}" 저장됨!`);
+                // Update the modal's saved prompts list
+                modal.savedPrompts = this.settings.savedPrompts;
             },
             async (promptId) => {
                 // Delete prompt
                 this.settings.savedPrompts = this.settings.savedPrompts.filter(p => p.id !== promptId);
                 await this.saveSettings();
+                new Notice('프롬프트가 삭제되었습니다');
             }
-        ).open();
+        );
+        modal.open();
     }
 
     private async processTextWithAI(editor: Editor, selectedText: string, prompt: string) {
