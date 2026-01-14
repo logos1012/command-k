@@ -1,15 +1,21 @@
 /* EditorK Plugin Styles */
 
-/* Modal Layout */
-.editor-k-modal-container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* Modal Layout - Best Practice Centering */
+.modal.editor-k-modal {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 900px !important;
+    max-width: calc(100vw - 40px) !important;
+    max-height: calc(100vh - 40px) !important;
+    margin: 0 !important;
 }
 
 .editor-k-prompt-modal {
-    width: 900px;
-    max-width: 90vw;
+    width: 100%;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
 }
 
 .editor-k-main-container {

@@ -28,38 +28,12 @@ export class PromptModal extends Modal {
     }
 
     onOpen() {
-        const { contentEl, modalEl, containerEl } = this;
-        contentEl.addClass('editor-k-prompt-modal');
+        const { contentEl, modalEl } = this;
 
-        // Add class to modal and container for CSS targeting
+        // Add custom class for CSS targeting - let Obsidian handle positioning
+        contentEl.addClass('editor-k-prompt-modal');
         if (modalEl) {
             modalEl.addClass('editor-k-modal');
-        }
-        if (containerEl) {
-            containerEl.addClass('editor-k-modal-container');
-        }
-
-        // Force positioning with inline styles for proper centering
-        if (modalEl) {
-            modalEl.style.position = 'relative';
-            modalEl.style.width = '900px';
-            modalEl.style.maxWidth = 'calc(100vw - 40px)';
-            modalEl.style.margin = '0 auto';
-            modalEl.style.left = '0';
-            modalEl.style.right = '0';
-            modalEl.style.top = '0';
-            modalEl.style.bottom = '0';
-            modalEl.style.transform = 'none';
-        }
-
-        if (containerEl) {
-            containerEl.style.display = 'flex';
-            containerEl.style.alignItems = 'center';
-            containerEl.style.justifyContent = 'center';
-            containerEl.style.position = 'fixed';
-            containerEl.style.inset = '0';
-            containerEl.style.padding = '20px';
-            containerEl.style.zIndex = '1000';
         }
 
         contentEl.createEl('h2', { text: 'EditorK: AI Text Editor' });

@@ -328,32 +328,10 @@ var PromptModal = class extends import_obsidian2.Modal {
     this.onDeletePrompt = onDeletePrompt;
   }
   onOpen() {
-    const { contentEl, modalEl, containerEl } = this;
+    const { contentEl, modalEl } = this;
     contentEl.addClass("editor-k-prompt-modal");
     if (modalEl) {
       modalEl.addClass("editor-k-modal");
-    }
-    if (containerEl) {
-      containerEl.addClass("editor-k-modal-container");
-    }
-    if (modalEl) {
-      modalEl.style.position = "relative";
-      modalEl.style.width = "800px";
-      modalEl.style.maxWidth = "calc(100vw - 40px)";
-      modalEl.style.margin = "0";
-      modalEl.style.left = "auto";
-      modalEl.style.right = "auto";
-      modalEl.style.top = "auto";
-      modalEl.style.bottom = "auto";
-      modalEl.style.transform = "none";
-    }
-    if (containerEl) {
-      containerEl.style.display = "flex";
-      containerEl.style.alignItems = "center";
-      containerEl.style.justifyContent = "center";
-      containerEl.style.position = "fixed";
-      containerEl.style.inset = "0";
-      containerEl.style.padding = "20px";
     }
     contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
     const mainContainer = contentEl.createDiv({ cls: "editor-k-main-container" });
