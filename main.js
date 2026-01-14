@@ -328,8 +328,33 @@ var PromptModal = class extends import_obsidian2.Modal {
     this.onDeletePrompt = onDeletePrompt;
   }
   onOpen() {
-    const { contentEl } = this;
+    const { contentEl, modalEl, containerEl } = this;
     contentEl.addClass("editor-k-prompt-modal");
+    if (modalEl) {
+      modalEl.addClass("editor-k-modal");
+    }
+    if (containerEl) {
+      containerEl.addClass("editor-k-modal-container");
+    }
+    if (modalEl) {
+      modalEl.style.position = "relative";
+      modalEl.style.width = "800px";
+      modalEl.style.maxWidth = "calc(100vw - 40px)";
+      modalEl.style.margin = "0";
+      modalEl.style.left = "auto";
+      modalEl.style.right = "auto";
+      modalEl.style.top = "auto";
+      modalEl.style.bottom = "auto";
+      modalEl.style.transform = "none";
+    }
+    if (containerEl) {
+      containerEl.style.display = "flex";
+      containerEl.style.alignItems = "center";
+      containerEl.style.justifyContent = "center";
+      containerEl.style.position = "fixed";
+      containerEl.style.inset = "0";
+      containerEl.style.padding = "20px";
+    }
     contentEl.createEl("h2", { text: "EditorK: AI Text Editor" });
     const mainContainer = contentEl.createDiv({ cls: "editor-k-main-container" });
     const topSection = mainContainer.createDiv({ cls: "editor-k-top-section" });
@@ -1274,20 +1299,13 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
     styleEl.textContent = `
             /* EditorK Plugin Styles */
 
-            /* Modal Layout */
-            .modal-bg:has(+ .modal-container .editor-k-prompt-modal) {
-                opacity: 0.85 !important;
-            }
-
-            .modal-container:has(.editor-k-prompt-modal) {
+            /* Modal Layout - Using direct class targeting */
+            .editor-k-modal-container {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
+                inset: 0 !important;
                 width: 100vw !important;
                 height: 100vh !important;
                 padding: 20px !important;
@@ -1295,22 +1313,23 @@ var CmdKPlugin = class extends import_obsidian4.Plugin {
                 z-index: 100 !important;
             }
 
-            .modal:has(.editor-k-prompt-modal) {
+            .editor-k-modal {
+                position: relative !important;
                 width: 800px !important;
                 max-width: calc(100vw - 40px) !important;
                 max-height: calc(100vh - 40px) !important;
                 overflow-y: auto !important;
-                position: relative !important;
                 left: auto !important;
                 right: auto !important;
                 top: auto !important;
                 bottom: auto !important;
                 transform: none !important;
-                margin: 0 !important;
+                margin: 0 auto !important;
             }
 
             .editor-k-prompt-modal {
                 width: 100% !important;
+                max-width: 100% !important;
             }
 
             .editor-k-main-container {
