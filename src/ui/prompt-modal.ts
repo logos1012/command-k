@@ -39,16 +39,16 @@ export class PromptModal extends Modal {
             containerEl.addClass('editor-k-modal-container');
         }
 
-        // Force positioning with inline styles
+        // Force positioning with inline styles for proper centering
         if (modalEl) {
             modalEl.style.position = 'relative';
-            modalEl.style.width = '800px';
+            modalEl.style.width = '900px';
             modalEl.style.maxWidth = 'calc(100vw - 40px)';
-            modalEl.style.margin = '0';
-            modalEl.style.left = 'auto';
-            modalEl.style.right = 'auto';
-            modalEl.style.top = 'auto';
-            modalEl.style.bottom = 'auto';
+            modalEl.style.margin = '0 auto';
+            modalEl.style.left = '0';
+            modalEl.style.right = '0';
+            modalEl.style.top = '0';
+            modalEl.style.bottom = '0';
             modalEl.style.transform = 'none';
         }
 
@@ -59,6 +59,7 @@ export class PromptModal extends Modal {
             containerEl.style.position = 'fixed';
             containerEl.style.inset = '0';
             containerEl.style.padding = '20px';
+            containerEl.style.zIndex = '1000';
         }
 
         contentEl.createEl('h2', { text: 'EditorK: AI Text Editor' });
