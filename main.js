@@ -32,44 +32,67 @@ var import_obsidian4 = require("obsidian");
 // src/types.ts
 var PRICING_PER_MILLION_TOKENS = {
   openai: {
-    "gpt-5.2": { input: 15, output: 60 },
-    "gpt-5.2-pro": { input: 30, output: 120 },
-    "gpt-5.1": { input: 10, output: 40 },
-    "gpt-5": { input: 8, output: 32 },
-    "gpt-5-mini": { input: 2, output: 8 },
-    "gpt-5-nano": { input: 0.5, output: 2 },
-    "gpt-5-pro": { input: 20, output: 80 },
-    "gpt-4.1": { input: 5, output: 20 },
-    "gpt-4.1-mini": { input: 1, output: 4 },
-    "gpt-4.1-nano": { input: 0.3, output: 1.2 },
+    "gpt-5.5": { input: 5, output: 30 },
+    "gpt-5.5-pro": { input: 30, output: 180 },
+    "gpt-5.4": { input: 2.5, output: 15 },
+    "gpt-5.4-mini": { input: 0.75, output: 4.5 },
+    "gpt-5.4-nano": { input: 0.2, output: 1.25 },
+    "gpt-5.4-pro": { input: 30, output: 180 },
+    "gpt-5.2": { input: 1.75, output: 14 },
+    "gpt-5.2-pro": { input: 21, output: 168 },
+    "gpt-5.1": { input: 1.25, output: 10 },
+    "gpt-5": { input: 1.25, output: 10 },
+    "gpt-5-mini": { input: 0.25, output: 2 },
+    "gpt-5-nano": { input: 0.05, output: 0.4 },
+    "gpt-5-pro": { input: 15, output: 120 },
+    "gpt-4.1": { input: 3, output: 12 },
+    "gpt-4.1-mini": { input: 0.8, output: 3.2 },
+    "gpt-4.1-nano": { input: 0.2, output: 0.8 },
     "gpt-4o": { input: 2.5, output: 10 },
     "gpt-4o-mini": { input: 0.15, output: 0.6 },
-    "o3": { input: 100, output: 400 },
-    "o3-pro": { input: 200, output: 800 },
-    "o4-mini": { input: 0.1, output: 0.4 },
+    "o3": { input: 2, output: 8 },
+    "o3-pro": { input: 20, output: 80 },
+    "o4-mini": { input: 4, output: 16 },
     "o1": { input: 15, output: 60 },
-    "o1-pro": { input: 30, output: 120 },
-    "o1-mini": { input: 3, output: 12 }
+    "o1-pro": { input: 150, output: 600 },
+    "o1-mini": { input: 1.1, output: 4.4 }
   },
   gemini: {
-    "gemini-1.5-flash": { input: 0.075, output: 0.3 },
-    "gemini-1.5-pro": { input: 1.25, output: 5 },
-    "gemini-2.0-flash": { input: 0.075, output: 0.3 }
+    "gemini-3.5-flash": { input: 2.7, output: 16.2 },
+    "gemini-3.1-pro-preview": { input: 2, output: 12 },
+    "gemini-3.1-flash-lite": { input: 0.25, output: 1.5 },
+    "gemini-3-flash-preview": { input: 0.5, output: 3 },
+    "gemini-2.5-pro": { input: 1.25, output: 10 },
+    "gemini-2.5-flash": { input: 0.3, output: 2.5 },
+    "gemini-2.5-flash-lite": { input: 0.1, output: 0.4 }
   },
   claude: {
+    "claude-fable-5": { input: 10, output: 50 },
+    "claude-mythos-5": { input: 10, output: 50 },
+    "claude-mythos-preview": { input: 10, output: 50 },
+    "claude-opus-4-8": { input: 5, output: 25 },
+    "claude-sonnet-5": { input: 2, output: 10 },
+    "claude-haiku-4-5-20251001": { input: 1, output: 5 },
+    "claude-haiku-4-5": { input: 1, output: 5 },
+    "claude-sonnet-4-6": { input: 3, output: 15 },
+    "claude-opus-4-7": { input: 5, output: 25 },
+    "claude-opus-4-6": { input: 5, output: 25 },
     "claude-3-5-sonnet-20241022": { input: 3, output: 15 },
     "claude-3-opus-20240229": { input: 15, output: 75 },
     "claude-3-haiku-20240307": { input: 0.25, output: 1.25 }
   }
 };
+var OPENAI_MODELS = Object.keys(PRICING_PER_MILLION_TOKENS.openai);
+var GEMINI_MODELS = Object.keys(PRICING_PER_MILLION_TOKENS.gemini);
+var CLAUDE_MODELS = Object.keys(PRICING_PER_MILLION_TOKENS.claude);
 var DEFAULT_SETTINGS = {
   aiProvider: "openai",
   openaiApiKey: "",
-  openaiModel: "gpt-4o-mini",
+  openaiModel: "gpt-5.5",
   geminiApiKey: "",
-  geminiModel: "gemini-1.5-flash",
+  geminiModel: "gemini-3.5-flash",
   claudeApiKey: "",
-  claudeModel: "claude-3-haiku-20240307",
+  claudeModel: "claude-sonnet-5",
   maxTokens: 7e3,
   savedPrompts: [
     {
@@ -109,6 +132,12 @@ function formatCost(input, output) {
 function getOpenAIModelLabel(model) {
   const pricing = PRICING_PER_MILLION_TOKENS.openai[model];
   const labels = {
+    "gpt-5.5": "GPT-5.5",
+    "gpt-5.5-pro": "GPT-5.5 Pro",
+    "gpt-5.4": "GPT-5.4",
+    "gpt-5.4-mini": "GPT-5.4 Mini",
+    "gpt-5.4-nano": "GPT-5.4 Nano",
+    "gpt-5.4-pro": "GPT-5.4 Pro",
     "gpt-5.2": "GPT-5.2",
     "gpt-5.2-pro": "GPT-5.2 Pro",
     "gpt-5.1": "GPT-5.1",
@@ -133,15 +162,29 @@ function getOpenAIModelLabel(model) {
 function getGeminiModelLabel(model) {
   const pricing = PRICING_PER_MILLION_TOKENS.gemini[model];
   const labels = {
-    "gemini-1.5-flash": "Gemini 1.5 Flash",
-    "gemini-1.5-pro": "Gemini 1.5 Pro",
-    "gemini-2.0-flash": "Gemini 2.0 Flash"
+    "gemini-3.5-flash": "Gemini 3.5 Flash",
+    "gemini-3.1-pro-preview": "Gemini 3.1 Pro Preview",
+    "gemini-3.1-flash-lite": "Gemini 3.1 Flash-Lite",
+    "gemini-3-flash-preview": "Gemini 3 Flash Preview",
+    "gemini-2.5-pro": "Gemini 2.5 Pro",
+    "gemini-2.5-flash": "Gemini 2.5 Flash",
+    "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite"
   };
   return `${labels[model]} (${formatCost(pricing.input, pricing.output)})`;
 }
 function getClaudeModelLabel(model) {
   const pricing = PRICING_PER_MILLION_TOKENS.claude[model];
   const labels = {
+    "claude-fable-5": "Claude Fable 5",
+    "claude-mythos-5": "Claude Mythos 5",
+    "claude-mythos-preview": "Claude Mythos Preview",
+    "claude-opus-4-8": "Claude Opus 4.8",
+    "claude-sonnet-5": "Claude Sonnet 5",
+    "claude-haiku-4-5-20251001": "Claude Haiku 4.5 (20251001)",
+    "claude-haiku-4-5": "Claude Haiku 4.5",
+    "claude-sonnet-4-6": "Claude Sonnet 4.6",
+    "claude-opus-4-7": "Claude Opus 4.7",
+    "claude-opus-4-6": "Claude Opus 4.6",
     "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
     "claude-3-opus-20240229": "Claude 3 Opus",
     "claude-3-haiku-20240307": "Claude 3 Haiku"
@@ -202,27 +245,7 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       }).inputEl.type = "password");
       new import_obsidian.Setting(containerEl).setName("OpenAI Model").setDesc("Model for text editing. Cost shown as input/output per 1M tokens.").addDropdown((dropdown) => {
-        const models = [
-          "gpt-5.2",
-          "gpt-5.2-pro",
-          "gpt-5.1",
-          "gpt-5",
-          "gpt-5-mini",
-          "gpt-5-nano",
-          "gpt-5-pro",
-          "gpt-4.1",
-          "gpt-4.1-mini",
-          "gpt-4.1-nano",
-          "gpt-4o",
-          "gpt-4o-mini",
-          "o3",
-          "o3-pro",
-          "o4-mini",
-          "o1",
-          "o1-pro",
-          "o1-mini"
-        ];
-        models.forEach((model) => {
+        OPENAI_MODELS.forEach((model) => {
           dropdown.addOption(model, getOpenAIModelLabel(model));
         });
         dropdown.setValue(this.plugin.settings.openaiModel).onChange(async (value) => {
@@ -238,8 +261,7 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       }).inputEl.type = "password");
       new import_obsidian.Setting(containerEl).setName("Gemini Model").setDesc("Model for text editing. Cost shown as input/output per 1M tokens.").addDropdown((dropdown) => {
-        const models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"];
-        models.forEach((model) => {
+        GEMINI_MODELS.forEach((model) => {
           dropdown.addOption(model, getGeminiModelLabel(model));
         });
         dropdown.setValue(this.plugin.settings.geminiModel).onChange(async (value) => {
@@ -255,12 +277,7 @@ var CmdKSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       }).inputEl.type = "password");
       new import_obsidian.Setting(containerEl).setName("Claude Model").setDesc("Model for text editing. Cost shown as input/output per 1M tokens.").addDropdown((dropdown) => {
-        const models = [
-          "claude-3-5-sonnet-20241022",
-          "claude-3-opus-20240229",
-          "claude-3-haiku-20240307"
-        ];
-        models.forEach((model) => {
+        CLAUDE_MODELS.forEach((model) => {
           dropdown.addOption(model, getClaudeModelLabel(model));
         });
         dropdown.setValue(this.plugin.settings.claudeModel).onChange(async (value) => {
@@ -1024,7 +1041,6 @@ var OpenAIProvider = class extends BaseAIProvider {
     this.model = model;
   }
   async processText(selectedText, prompt) {
-    var _a;
     if (!this.validateSettings()) {
       throw new Error("OpenAI API key is not configured");
     }
@@ -1039,6 +1055,16 @@ var OpenAIProvider = class extends BaseAIProvider {
 ${selectedText}
 
 User Request: ${prompt}`;
+    if (this.isResponsesAPIModel(this.model)) {
+      return this.processTextWithResponsesAPI(systemPrompt, userContent);
+    }
+    return this.processTextWithChatCompletions(systemPrompt, userContent);
+  }
+  isResponsesAPIModel(model) {
+    return model.startsWith("gpt-5") || model.startsWith("gpt-4.1") || model.startsWith("o3") || model.startsWith("o4");
+  }
+  async processTextWithChatCompletions(systemPrompt, userContent) {
+    var _a;
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
@@ -1070,6 +1096,58 @@ User Request: ${prompt}`;
       }
       throw new Error("Failed to process text with OpenAI");
     }
+  }
+  async processTextWithResponsesAPI(systemPrompt, userContent) {
+    var _a;
+    try {
+      const response = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.model,
+          instructions: systemPrompt,
+          input: userContent,
+          max_output_tokens: this.maxTokens
+        })
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI API Error: ${((_a = error.error) == null ? void 0 : _a.message) || response.statusText}`);
+      }
+      const data = await response.json();
+      const text = this.extractResponsesText(data);
+      if (!text) {
+        throw new Error("OpenAI API returned an empty response");
+      }
+      return text.trim();
+    } catch (error) {
+      console.error("OpenAI Responses API Error:", error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Failed to process text with OpenAI");
+    }
+  }
+  extractResponsesText(data) {
+    if (typeof data.output_text === "string") {
+      return data.output_text;
+    }
+    let text = "";
+    if (Array.isArray(data.output)) {
+      for (const item of data.output) {
+        if (item.type === "message" && Array.isArray(item.content)) {
+          for (const contentItem of item.content) {
+            if (contentItem.type === "output_text" && typeof contentItem.text === "string") {
+              text += contentItem.text;
+            }
+          }
+        }
+      }
+    }
+    return text;
   }
   validateSettings() {
     return !!this.apiKey && this.apiKey.trim() !== "";

@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, Modal, TextComponent, ButtonComponent } from 'obsidian';
 import CmdKPlugin from './main';
-import { PRICING_PER_MILLION_TOKENS, SavedPrompt } from './types';
+import { CLAUDE_MODELS, GEMINI_MODELS, OPENAI_MODELS, PRICING_PER_MILLION_TOKENS, SavedPrompt } from './types';
 
 type OpenAIModel = keyof typeof PRICING_PER_MILLION_TOKENS.openai;
 type GeminiModel = keyof typeof PRICING_PER_MILLION_TOKENS.gemini;
@@ -13,6 +13,12 @@ function formatCost(input: number, output: number): string {
 function getOpenAIModelLabel(model: OpenAIModel): string {
     const pricing = PRICING_PER_MILLION_TOKENS.openai[model];
     const labels: Record<OpenAIModel, string> = {
+        'gpt-5.5': 'GPT-5.5',
+        'gpt-5.5-pro': 'GPT-5.5 Pro',
+        'gpt-5.4': 'GPT-5.4',
+        'gpt-5.4-mini': 'GPT-5.4 Mini',
+        'gpt-5.4-nano': 'GPT-5.4 Nano',
+        'gpt-5.4-pro': 'GPT-5.4 Pro',
         'gpt-5.2': 'GPT-5.2',
         'gpt-5.2-pro': 'GPT-5.2 Pro',
         'gpt-5.1': 'GPT-5.1',
@@ -38,9 +44,13 @@ function getOpenAIModelLabel(model: OpenAIModel): string {
 function getGeminiModelLabel(model: GeminiModel): string {
     const pricing = PRICING_PER_MILLION_TOKENS.gemini[model];
     const labels: Record<GeminiModel, string> = {
-        'gemini-1.5-flash': 'Gemini 1.5 Flash',
-        'gemini-1.5-pro': 'Gemini 1.5 Pro',
-        'gemini-2.0-flash': 'Gemini 2.0 Flash',
+        'gemini-3.5-flash': 'Gemini 3.5 Flash',
+        'gemini-3.1-pro-preview': 'Gemini 3.1 Pro Preview',
+        'gemini-3.1-flash-lite': 'Gemini 3.1 Flash-Lite',
+        'gemini-3-flash-preview': 'Gemini 3 Flash Preview',
+        'gemini-2.5-pro': 'Gemini 2.5 Pro',
+        'gemini-2.5-flash': 'Gemini 2.5 Flash',
+        'gemini-2.5-flash-lite': 'Gemini 2.5 Flash-Lite',
     };
     return `${labels[model]} (${formatCost(pricing.input, pricing.output)})`;
 }
@@ -48,6 +58,16 @@ function getGeminiModelLabel(model: GeminiModel): string {
 function getClaudeModelLabel(model: ClaudeModel): string {
     const pricing = PRICING_PER_MILLION_TOKENS.claude[model];
     const labels: Record<ClaudeModel, string> = {
+        'claude-fable-5': 'Claude Fable 5',
+        'claude-mythos-5': 'Claude Mythos 5',
+        'claude-mythos-preview': 'Claude Mythos Preview',
+        'claude-opus-4-8': 'Claude Opus 4.8',
+        'claude-sonnet-5': 'Claude Sonnet 5',
+        'claude-haiku-4-5-20251001': 'Claude Haiku 4.5 (20251001)',
+        'claude-haiku-4-5': 'Claude Haiku 4.5',
+        'claude-sonnet-4-6': 'Claude Sonnet 4.6',
+        'claude-opus-4-7': 'Claude Opus 4.7',
+        'claude-opus-4-6': 'Claude Opus 4.6',
         'claude-3-5-sonnet-20241022': 'Claude 3.5 Sonnet',
         'claude-3-opus-20240229': 'Claude 3 Opus',
         'claude-3-haiku-20240307': 'Claude 3 Haiku',
@@ -163,13 +183,7 @@ export class CmdKSettingTab extends PluginSettingTab {
                 .setName('OpenAI Model')
                 .setDesc('Model for text editing. Cost shown as input/output per 1M tokens.')
                 .addDropdown(dropdown => {
-                    const models: OpenAIModel[] = [
-                        'gpt-5.2', 'gpt-5.2-pro', 'gpt-5.1', 'gpt-5', 'gpt-5-mini',
-                        'gpt-5-nano', 'gpt-5-pro', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano',
-                        'gpt-4o', 'gpt-4o-mini', 'o3', 'o3-pro', 'o4-mini',
-                        'o1', 'o1-pro', 'o1-mini'
-                    ];
-                    models.forEach(model => {
+                    OPENAI_MODELS.forEach(model => {
                         dropdown.addOption(model, getOpenAIModelLabel(model));
                     });
                     dropdown.setValue(this.plugin.settings.openaiModel)
@@ -200,8 +214,7 @@ export class CmdKSettingTab extends PluginSettingTab {
                 .setName('Gemini Model')
                 .setDesc('Model for text editing. Cost shown as input/output per 1M tokens.')
                 .addDropdown(dropdown => {
-                    const models: GeminiModel[] = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash'];
-                    models.forEach(model => {
+                    GEMINI_MODELS.forEach(model => {
                         dropdown.addOption(model, getGeminiModelLabel(model));
                     });
                     dropdown.setValue(this.plugin.settings.geminiModel)
@@ -232,12 +245,7 @@ export class CmdKSettingTab extends PluginSettingTab {
                 .setName('Claude Model')
                 .setDesc('Model for text editing. Cost shown as input/output per 1M tokens.')
                 .addDropdown(dropdown => {
-                    const models: ClaudeModel[] = [
-                        'claude-3-5-sonnet-20241022',
-                        'claude-3-opus-20240229',
-                        'claude-3-haiku-20240307'
-                    ];
-                    models.forEach(model => {
+                    CLAUDE_MODELS.forEach(model => {
                         dropdown.addOption(model, getClaudeModelLabel(model));
                     });
                     dropdown.setValue(this.plugin.settings.claudeModel)

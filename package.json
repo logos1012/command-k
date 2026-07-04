@@ -1,6 +1,6 @@
 {
   "name": "obsidian-cmd-k",
-  "version": "1.0.0",
+  "version": "1.2.9",
   "description": "AI-powered text editing for Obsidian, inspired by Cursor IDE's CMD+K",
   "main": "main.js",
   "scripts": {
